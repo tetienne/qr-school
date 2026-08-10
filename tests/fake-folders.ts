@@ -38,12 +38,15 @@ export type Written = Record<string, number>;
 
 /**
  * Installs the fake picker before the page loads. `existing` pre-fills the
- * destination so a run can collide with a previous one.
+ * destination so a run can collide with a previous one. `refuse` names
+ * destination subfolders whose writes reject, so a run can lose a photo
+ * without the page having done anything wrong.
  */
 export async function useFakeFolders(
   page: Page,
   photos: readonly PhotoSpec[],
   existing: readonly string[] = [],
+  refuse: readonly string[] = [],
 ): Promise<void> {
   const wire: WireSpec[] = photos.map((photo) => ({
     name: photo.name,
@@ -53,7 +56,15 @@ export async function useFakeFolders(
   }));
 
   await page.addInitScript(
-    ({ specs, alreadyThere }: { specs: WireSpec[]; alreadyThere: readonly string[] }) => {
+    ({
+      specs,
+      alreadyThere,
+      refused,
+    }: {
+      specs: WireSpec[];
+      alreadyThere: readonly string[];
+      refused: readonly string[];
+    }) => {
       const written: Written = {};
       (window as unknown as { __written: Written }).__written = written;
 
@@ -141,6 +152,9 @@ export async function useFakeFolders(
                 ? Promise.resolve({})
                 : Promise.reject(new Error('not found'));
             }
+            // A folder the destination will not write into. Rejecting on create
+            // rather than on write is what a full disk or a read-only card does.
+            if (refused.includes(path)) return Promise.reject(new Error('refused'));
             present.add(full);
             return Promise.resolve({
               createWritable: () =>
@@ -162,7 +176,7 @@ export async function useFakeFolders(
         id?: string;
       }) => Promise.resolve(options?.id === 'photos-destination' ? destination : source);
     },
-    { specs: wire, alreadyThere: existing },
+    { specs: wire, alreadyThere: existing, refused: refuse },
   );
 }
 

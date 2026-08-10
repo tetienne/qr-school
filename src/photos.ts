@@ -19,6 +19,14 @@ import { icon, type IconName } from './icons';
 import { showRail } from './step-rail';
 import { directoryPicker as folderPicker, supportsFolders, type Directory } from './folder-access';
 import { forgetFolder, grantAccess, recallFolder, rememberFolder } from './folder-memory';
+import {
+  countFiling,
+  dismissSupport,
+  parseSupportState,
+  serializeSupportState,
+  shouldOfferSupport,
+  type SupportState,
+} from './support';
 
 const directoryPicker = folderPicker();
 const supportsDirectories = supportsFolders();
@@ -30,6 +38,10 @@ const supportsDirectories = supportsFolders();
 // autocompletion here.
 const NAMES_STORAGE_KEY = 'qr-school.names';
 const SIZE_STORAGE_KEY = 'qr-school.size';
+// Same prefix as the three keys above. Those cannot be renamed without emptying
+// the class list already in her browser, and one stale name beats two namespaces
+// in the same storage.
+const SUPPORT_STORAGE_KEY = 'qr-school.support';
 
 // --- State ------------------------------------------------------------------
 
@@ -126,6 +138,8 @@ const el = {
   copyLabel: required('copy-label', HTMLSpanElement),
   copyStatus: required('copy-status', HTMLElement),
   copyOutcome: required('copy-outcome', HTMLSpanElement),
+  supportNote: required('support-note', HTMLParagraphElement),
+  supportDismiss: required('support-dismiss', HTMLButtonElement),
 };
 
 /** Named in every sentence about the copy, so she never has to guess where. */
@@ -779,6 +793,32 @@ function copyBlockedReason(pending: boolean, destinationReady: boolean): string 
   return '';
 }
 
+// --- The one thing the app asks for -----------------------------------------
+
+const readSupport = (): SupportState =>
+  parseSupportState(localStorage.getItem(SUPPORT_STORAGE_KEY));
+
+const writeSupport = (state: SupportState): void => {
+  localStorage.setItem(SUPPORT_STORAGE_KEY, serializeSupportState(state));
+};
+
+/**
+ * Counts a filing run that went entirely well, and shows the note if this is one
+ * of its three moments. A run that lost a photo is not one of them: the report
+ * just above says so in amber, and a request for money over it would read as the
+ * app not having noticed.
+ */
+function offerSupportAfterFiling(): void {
+  const counted = countFiling(readSupport());
+  writeSupport(counted);
+  el.supportNote.hidden = !shouldOfferSupport(counted);
+}
+
+el.supportDismiss.addEventListener('click', () => {
+  writeSupport(dismissSupport(readSupport()));
+  el.supportNote.hidden = true;
+});
+
 // --- Copying ----------------------------------------------------------------
 
 async function copyPhotos(): Promise<void> {
@@ -787,6 +827,7 @@ async function copyPhotos(): Promise<void> {
 
   el.copy.disabled = true;
   el.copyDone.hidden = true;
+  el.supportNote.hidden = true;
 
   let copied = 0;
   let failed = 0;
@@ -818,6 +859,7 @@ async function copyPhotos(): Promise<void> {
   el.copyDone.className = `callout mt-line ${failed ? 'callout-warn' : 'callout-ok'}`;
   el.copyDone.replaceChildren(icon(failed ? 'warning' : 'copied'), el.copyDoneText);
   el.copyDone.hidden = false;
+  if (!failed && copied) offerSupportAfterFiling();
   refreshSummary();
   refreshCopyButton();
 }

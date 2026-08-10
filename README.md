@@ -71,6 +71,12 @@ Original photos are never modified or deleted, only copied. Filing the same
 folder twice overwrites nothing — the numbering continues. It follows the order
 of the photos in the folder, not the order the gallery displays them in.
 
+Three times in the life of a browser — on the 5th, 15th and 40th filing that
+loses nothing — a line under the report offers a link to buy the author a
+coffee. _Ne plus afficher_ ends it for good; the footer of every page keeps the
+link for whoever wants it. It is a plain link: nothing is measured, nothing is
+sent, and the app makes no request until she clicks.
+
 ## Browsers
 
 Writing straight into a chosen folder needs the File System Access API. Chrome

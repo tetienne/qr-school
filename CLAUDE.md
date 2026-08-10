@@ -39,8 +39,10 @@ teacher. The boundary runs exactly here:
   (`prenom=`, `nom=`), because that is what a French label generator emits.
 
 The `localStorage` keys keep the project's old name (`qr-school.names`,
-`qr-school.label-options`, `qr-school.size`). They point at data already in the
-teacher's browser; renaming them would silently empty her class list.
+`qr-school.label-options`, `qr-school.size`, `qr-school.support`). They point at
+data already in the teacher's browser; renaming them would silently empty her
+class list. New keys take the same prefix on purpose: the older three cannot
+move, and one stale name is better than two namespaces in the same storage.
 
 ## Where things live
 

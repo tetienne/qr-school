@@ -197,8 +197,10 @@
     @apply gap-hair text-ink-soft hover:text-red-ink inline-flex items-center font-bold;
   }
 
+  /* Two links now, so they stack instead of forming ragged columns on a narrow
+     screen. */
   .page-foot {
-    @apply border-tableau text-caption text-ink-soft gap-line mt-section pt-line mx-auto flex max-w-5xl items-center border-t-3 border-double;
+    @apply border-tableau text-caption text-ink-soft gap-line mt-section pt-line mx-auto flex max-w-5xl flex-wrap items-center border-t-3 border-double;
   }
 
   .page-foot a {
@@ -459,6 +461,20 @@
 
   .callout-print > svg {
     @apply text-red-ink;
+  }
+
+  /* The only place the app asks for something. Small, flat, no border: a callout
+     would give a request the weight the warnings need to keep for themselves. */
+  .support-note {
+    @apply gap-word text-caption text-ink-soft flex flex-wrap items-baseline;
+  }
+
+  .support-note a {
+    @apply text-ink hover:text-red-ink font-bold underline;
+  }
+
+  .support-dismiss {
+    @apply text-ink-soft hover:text-red-ink underline;
   }
 
   /* --- Step 4 gallery ----------------------------------------------------- */
