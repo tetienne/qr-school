@@ -84,9 +84,7 @@ npm run verify    # the gate: format, lint, types, tests, build, browser tests
 
 ## Licence
 
-[MIT](LICENSE), keeping the copyright notice, which ships in three places so
-it is hard to lose by accident: `LICENSE`, a banner on each entry chunk of the
-build, and the _Code source_ link in the page footer.
+[MIT](LICENSE).
 
 Two dependencies ship inside the built site under their own terms:
 
