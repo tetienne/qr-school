@@ -25,8 +25,12 @@ interface Stored {
  * seeded between two loads because a page needs an origin before it has a
  * `localStorage`, which is how `photos.spec.ts` does it too.
  */
-async function openFilingPage(page: Page, support: Stored): Promise<void> {
-  await useFakeFolders(page, FOLDER);
+async function openFilingPage(
+  page: Page,
+  support: Stored,
+  refuse: readonly string[] = [],
+): Promise<void> {
+  await useFakeFolders(page, FOLDER, [], refuse);
   await page.goto('photos.html');
   await page.evaluate((state: Stored) => {
     localStorage.setItem('qr-school.names', 'Léa\nNoé');
@@ -111,4 +115,17 @@ test('skips the last moment too, in a browser where she closed it', async ({ pag
 
   await expect(page.locator(NOTE)).toBeHidden();
   expect(await storedSupport(page)).toEqual({ runs: 40, dismissed: true });
+});
+
+// The guard that matters most, and the only one no unit test can reach: the
+// count lives in the page, and a lost photo must leave it exactly where it was.
+test('says nothing over a filing that lost a photo', async ({ page }) => {
+  await openFilingPage(page, { runs: 4, dismissed: false }, ['Noé']);
+
+  await fileEverything(page);
+  await expect(page.getByText('1 photo copiée, 1 en échec.')).toBeVisible({ timeout: 60_000 });
+
+  await expect(page.locator(NOTE)).toBeHidden();
+  // Not counted at all: the next clean filing is still the fifth.
+  expect(await storedSupport(page)).toEqual({ runs: 4, dismissed: false });
 });
