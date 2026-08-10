@@ -1,9 +1,7 @@
 # Working in this repository
 
-`README.md` is written for whoever uses or hosts the app: what the teacher does
-with it, which browsers work, what it deliberately will not do. Read it before a
-first change — the behaviour it describes is the specification. What follows is
-only what an agent gets wrong without being told.
+`docs/` describes how the app is built and tested. What follows is only what an
+agent gets wrong without being told.
 
 ## Commits and pull requests
 
@@ -22,16 +20,16 @@ docs: explain the label palette
 - The body says _why_ before _what_, wrapped at 80 columns. The diff already
   says what changed; a message that only paraphrases it is worth nothing.
 - A pull request title obeys the same rule, and its body covers the whole
-  branch — not just the commit it was opened from.
+  branch, not just the commit it was opened from.
 
 ## Language
 
-Code is English, the interface is French — the user is a French primary school
+Code is English, the interface is French: the user is a French primary school
 teacher. The boundary runs exactly here:
 
 - identifiers, comments, commit messages, test names, HTML `id`s and CSS class
   names are English;
-- every string she can read stays French — page copy, button labels,
+- every string she can read stays French: page copy, button labels,
   `aria-label`s, placeholders, status messages, and the `Sans-nom` fallback that
   ends up in a file name;
 - French stays where it is behaviour rather than prose: `<html lang="fr">`,
@@ -44,60 +42,18 @@ data already in the teacher's browser; renaming them would silently empty her
 class list. New keys take the same prefix on purpose: the older three cannot
 move, and one stale name is better than two namespaces in the same storage.
 
-## Where things live
+## Two rules in `docs/architecture.md` that are not suggestions
 
-One module per idea, named after it, and the module boundary follows what a test
-can reach: names, file names, numbering, palettes and sheet geometry are plain
-functions with no DOM and no disk, and `photos.ts` and `labels.ts` are the only
-files that know about elements. Keep it that way — the disk is reached through an
-`exists` predicate a test can replace, not through a handle passed down the call
-stack.
-
-Never branch on a browser name. What separates Chromium from Firefox and Safari
-here is one capability, `showDirectoryPicker`, and `folder-access.ts` is the only
-place that asks.
+Never branch on a browser name, and treat any change to the appearance of a
+label as a decoding change. Both look like preferences and are not.
 
 ## Before saying it works
 
-```bash
-npm run verify   # format:check, lint, typecheck, tests, build, browser tests
-```
-
 `npm run verify` is the gate; the CI runs the same thing. Nothing is "done"
-until it passes. The browser tests need Chromium once:
-`npx playwright install chromium`.
+until it passes.
 
-Tests carry the intent, not just the assertion: `photo-reading.test.ts` builds
-fake photos by 3D projection because that, not a rotated image, is what a
-hand-held photo looks like. Extend that suite rather than weakening it — and if
-a test documents a limit that starts passing, that is news to notice, not a
-failure to silence.
-
-Anything the DOM does — the worker pool, the pages of the label sheet, writing to
-a folder — belongs in `tests/` and needs Chromium; `npm test` cannot see it. When
-you add one, break the code on purpose and check that test, and only that test,
-goes red. A browser test that has never failed is not known to work.
-
-Those tests drive the **built** site: the worker URL and the `.wasm` path are
-rewritten at build time, so a dev-server run would miss exactly the breakage they
-exist for. `showDirectoryPicker` opens a native window no test can drive, hence
-the two fakes in `tests/fake-folders.ts` — a source drawing its photos from the
-same QR matrix the label page uses, and a destination recording what it received.
-Nothing binary is committed, and a test label stays one the app would print.
-Judging the decoder is not their job; `photo-reading.test.ts` owns that.
-
-Three things no suite here covers, so a change touching them is only ever
-verified by hand: the native Windows folder picker, the download fallback for
-browsers without folder access, and real camera photos.
-
-## The one constraint that breaks the app silently
-
-**A label the decoder cannot read looks perfectly fine on screen.** Every ink
-stays dark: zxing thresholds on brightness alone, so a pastel QR code stops
-being decoded while still looking like a QR code. The palettes in
-`label-theme.ts` sit under 40 % of the brightness of white, and a colour picked
-by hand goes through `readableInk` first.
-
-Anything touching the appearance of a label — colour, module shape, quiet zone,
-size, the white patch under the code — is a decoding change. Photograph it in
-`photo-reading.test.ts` and check the first name comes back.
+Tests carry the intent, not just the assertion. Extend a suite rather than
+weakening it, and if a test documents a limit that starts passing, that is news
+to notice, not a failure to silence. When you add a browser test, break the code
+on purpose and check that test, and only that test, goes red: a browser test
+that has never failed is not known to work.
