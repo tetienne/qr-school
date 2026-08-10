@@ -7,4 +7,5 @@ playwright-report/
 # Local agent tooling, git-ignored outside this repo
 .claude/.headroom_wrap_marker.json
 .serena/
+.superpowers/
 .tokensave/
