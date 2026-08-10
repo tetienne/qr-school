@@ -129,3 +129,16 @@ test('says nothing over a filing that lost a photo', async ({ page }) => {
   // Not counted at all: the next clean filing is still the fifth.
   expect(await storedSupport(page)).toEqual({ runs: 4, dismissed: false });
 });
+
+// The footer is the only route left for whoever closed the note, or who goes
+// looking before the fifth filing. It is the same footer on all three pages, so
+// all three carry it.
+for (const page_ of ['index.html', 'labels.html', 'photos.html']) {
+  test(`keeps the link in the footer of ${page_}`, async ({ page }) => {
+    await page.goto(page_);
+
+    const link = page.locator('.page-foot').getByRole('link', { name: "M'offrir un café" });
+    await expect(link).toHaveAttribute('href', 'https://paypal.me/ThibautE');
+    await expect(link).toHaveAttribute('rel', 'noreferrer');
+  });
+}
