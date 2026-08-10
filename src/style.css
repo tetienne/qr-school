@@ -461,6 +461,20 @@
     @apply text-red-ink;
   }
 
+  /* The only place the app asks for something. Small, flat, no border: a callout
+     would give a request the weight the warnings need to keep for themselves. */
+  .support-note {
+    @apply gap-word text-caption text-ink-soft flex flex-wrap items-baseline;
+  }
+
+  .support-note a {
+    @apply text-ink hover:text-red-ink font-bold underline;
+  }
+
+  .support-dismiss {
+    @apply text-ink-soft hover:text-red-ink underline;
+  }
+
   /* --- Step 4 gallery ----------------------------------------------------- */
 
   /* One of three sizes, as a row of stamps: the radio itself is off screen, so
