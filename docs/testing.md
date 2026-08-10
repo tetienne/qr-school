@@ -17,7 +17,8 @@ writing to a folder, needs a real browser and lives in `tests/`. Those tests
 drive the **built** site, not the dev server: the worker URL and the `.wasm`
 path are rewritten at build time, so a dev-server run would miss exactly the
 breakage they exist for. The browser tests need Chromium once:
-`npx playwright install chromium`.
+`npx playwright install chromium`. To look at that same build by hand,
+`npm run build` writes the site into `dist/` and `npm run preview` serves it.
 
 `showDirectoryPicker` opens a native window no test can drive, hence the two
 fakes in `tests/fake-folders.ts`: a source drawing its photos from the same QR

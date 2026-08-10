@@ -41,7 +41,7 @@ Code, comments, and this file are English.
 > readable on screen can still fail to decode, because a pastel ink stops being
 > read while still looking like a QR code to a human eye. Every colour the app
 > prints is darkened first. Changing how a label looks is a decoding change, not
-> a cosmetic one: see [the label sheet](docs/architecture.md).
+> a cosmetic one: see [ink dark enough to decode](docs/architecture.md#ink-dark-enough-to-decode).
 
 ## What it will not do
 
