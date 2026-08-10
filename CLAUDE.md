@@ -1,9 +1,6 @@
 # Working in this repository
 
-`README.md` is written for whoever uses or hosts the app: what the teacher does
-with it, which browsers work, what it deliberately will not do. Read it before a
-first change — the behaviour it describes is the specification. What follows is
-only what an agent gets wrong without being told.
+What follows is only what an agent gets wrong without being told.
 
 ## Commits and pull requests
 
