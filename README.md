@@ -31,23 +31,17 @@ Code, comments, and this file are English.
    text, and a colour and small drawing derived from the name itself, so a child
    who cannot read yet still finds "the orange label with the fox", and finds the
    same one again next term.
-2. **Photograph.** Label and work in the same frame. `photo-reading.test.ts`
-   holds the decoder to tilts up to 45° on one axis, 35° on two, and in-plane
-   rotation.
+2. **Photograph.** Label and work in the same frame. A hand-held tilt is fine.
 3. **Ranger les photos.** Point the app at a folder of photos, it decodes every
-   QR code client-side across a pool of workers, leaves an editable first-name
-   field on the few it could not read, and copies (never moves, never deletes)
-   each photo into a per-child folder.
+   QR code without sending one anywhere, leaves an editable first-name field on
+   the few it could not read, and copies (never moves, never deletes) each photo
+   into a per-child folder.
 
-> **The one thing that breaks silently.** A QR code that looks perfectly dark
-> and readable on screen can still fail to decode: zxing thresholds on
-> brightness alone, so a pastel ink stops being read while still looking like
-> a QR code to a human eye. Every palette in `label-theme.ts` sits under 40 %
-> of the brightness of white, and any colour a contributor adds must go
-> through `readableInk` first. If you touch colour, module shape, quiet zone,
-> size, or the white patch under the code, you are making a decoding change:
-> prove it in `photo-reading.test.ts`, which photographs a generated label by
-> 3D projection and checks the first name comes back.
+> **The one thing that breaks silently.** A QR code that looks perfectly
+> readable on screen can still fail to decode, because a pastel ink stops being
+> read while still looking like a QR code to a human eye. Every colour the app
+> prints is darkened first. Changing how a label looks is a decoding change, not
+> a cosmetic one: see [the label sheet](docs/architecture.md).
 
 ## What it will not do
 
@@ -64,44 +58,29 @@ Code, comments, and this file are English.
 ## Browsers
 
 Writing straight into a chosen folder needs the File System Access API. Chrome
-and Edge have it, Firefox and Safari do not. Where it is missing, the filing
-page warns and disables the destination folder and the per-name subfolders:
-renamed photos arrive one by one in Downloads, without subfolders. The
-capability, `showDirectoryPicker`, is the only thing the code checks, and that
-is on purpose: Brave ships Chromium, turns the API off ([brave#11407]), and
-appears in no compatibility table at all. `folder-access.ts` asks for
-`showDirectoryPicker` and believes the answer.
+and Edge have it, Firefox and Safari do not, and Brave ships Chromium but turns
+it off ([brave#11407]). Where it is missing, the filing page warns and disables
+the destination folder and the per-name subfolders: renamed photos arrive one by
+one in Downloads, without subfolders. Nothing in the app asks which browser it
+is running in, only whether the capability is there.
 
 [brave#11407]: https://github.com/brave/brave-browser/issues/11407
 
-## Running it
+## Working on it
 
 ```bash
 npm install
-npm run dev           # local server with hot reload
-npm run verify        # format:check, lint, typecheck, all tests, build, browser tests
-npm test              # unit tests (Vitest)
-npm run test:browser  # browser tests (Playwright), on the built site
-npm run build         # static site into dist/
-npm run preview       # serve dist/ to check the build
+npm run dev       # local server with hot reload
+npm run verify    # the gate: format, lint, types, tests, build, browser tests
 ```
 
-`npm run verify` is the gate; CI runs the same thing. The browser tests need
-Chromium once: `npx playwright install chromium`.
+`npm run verify` is what CI runs, and nothing is done until it passes.
 
-TypeScript runs in strict mode (including `noUncheckedIndexedAccess`),
-Tailwind CSS 4 through its Vite plugin, no UI framework: the DOM is driven
-directly. `npm test` covers the plain-function half of `src/`; `npm run
-test:browser` covers what needs a real browser (the worker pool, the pages of
-the label sheet, writing to a folder), driven against the **built** site
-because the worker URL and the `.wasm` path are rewritten at build time.
-Three things stay outside any suite and are only ever checked by hand: the
-native Windows folder picker, the download fallback for browsers without
-folder access, and real camera photos.
-
-Two things worth reading before a first change: [where the module boundary
-runs, and what the app stores](docs/architecture.md), and [how the site gets
-published](docs/deploying.md).
+- [Architecture](docs/architecture.md): where the module boundary runs, the
+  label sheet, the pool of decoding workers, what the app stores.
+- [Testing](docs/testing.md): what runs in Node, what needs a browser, and the
+  three things only a human can check.
+- [Deploying](docs/deploying.md): publishing to GitHub Pages.
 
 ## Licence
 

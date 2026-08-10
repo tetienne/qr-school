@@ -22,6 +22,20 @@ true.
 Two pupils called `Léa` are disambiguated by the teacher (`Léa B`, `Léa M`), not
 by the app.
 
+## Ink dark enough to decode
+
+A label the decoder cannot read looks perfectly fine on screen: zxing thresholds
+on brightness alone, so a pastel QR code stops being decoded while still looking
+like a QR code. Every palette in `label-theme.ts` sits under 40 % of the
+brightness of white, and a colour picked by hand goes through `readableInk`
+first, which darkens it before it ever reaches a label. Canary yellow prints as
+mustard on purpose.
+
+Anything touching the appearance of a label, colour, module shape, quiet zone,
+size, or the white patch under the code, is a decoding change rather than a
+cosmetic one. Photograph it in `photo-reading.test.ts` and check the first name
+comes back.
+
 ## Decoding a folder of photos
 
 Reading QR codes out of a folder is CPU-bound, and a folder can hold a term's
