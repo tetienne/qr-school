@@ -197,8 +197,10 @@
     @apply gap-hair text-ink-soft hover:text-red-ink inline-flex items-center font-bold;
   }
 
+  /* Two links now, so they stack instead of forming ragged columns on a narrow
+     screen. */
   .page-foot {
-    @apply border-tableau text-caption text-ink-soft gap-line mt-section pt-line mx-auto flex max-w-5xl items-center border-t-3 border-double;
+    @apply border-tableau text-caption text-ink-soft gap-line mt-section pt-line mx-auto flex max-w-5xl flex-wrap items-center border-t-3 border-double;
   }
 
   .page-foot a {
