@@ -30,8 +30,7 @@ Code, comments, and this file are English.
    print an A4 sheet. Each label carries the QR code, the first name in plain
    text, and a colour and small drawing derived from the name itself, so a child
    who cannot read yet still finds "the orange label with the fox", and finds the
-   same one again next term. Two pupils called `Léa` are disambiguated by the
-   teacher (`Léa B`, `Léa M`), not by the app.
+   same one again next term.
 2. **Photograph.** Label and work in the same frame. `photo-reading.test.ts`
    holds the decoder to tilts up to 45° on one axis, 35° on two, and in-plane
    rotation.
@@ -49,30 +48,6 @@ Code, comments, and this file are English.
 > size, or the white patch under the code, you are making a decoding change:
 > prove it in `photo-reading.test.ts`, which photographs a generated label by
 > 3D projection and checks the first name comes back.
-
-## Where things live
-
-Business logic stays out of the DOM: most of `src/` is plain functions over
-names, file names, palettes, and sheet geometry, tested in Node with no DOM and
-no disk. `photos.ts` and `labels.ts` are the only files that know about
-elements, and disk access goes through an `exists` predicate a test can
-replace, never through a handle passed down the call stack. `folder-access.ts`
-is the only place that asks whether the browser can write to a folder at all,
-by testing for the `showDirectoryPicker` capability, never by checking a
-browser name.
-
-The label sheet is laid out in millimetres and cut into pages by
-`label-layout.ts`, so no label is ever split by a page break. That geometry
-assumes the print dialog is set to **A4 at 100 %** with the browser's own
-headers and footers off; the app says so on the page, and a change to the
-layout has to keep that assumption true.
-
-The class list and the label options live in `localStorage` under keys that
-still carry the project's former name: `qr-school.names`,
-`qr-school.label-options`, `qr-school.size`. They point at data already sitting
-in a teacher's browser, so renaming them would silently empty her class list.
-Remembered folder handles are not there; a directory handle is a live object
-rather than a path, and `folder-memory.ts` keeps it in IndexedDB.
 
 ## What it will not do
 
@@ -124,21 +99,9 @@ Three things stay outside any suite and are only ever checked by hand: the
 native Windows folder picker, the download fallback for browsers without
 folder access, and real camera photos.
 
-## Deploying
-
-Push to GitHub, then `Settings` > `Pages` > _Source_: **GitHub Actions**.
-`.github/workflows/deploy.yml` checks formatting, lint and types, runs the
-tests, builds, and publishes on every push to `main`; pull requests run the
-same checks without deploying. The base path comes from the repository name
-(`VITE_BASE`); `npm run dev` serves from the root. HTTPS is mandatory, since
-the folder access API does not work over `file://`, and GitHub Pages provides
-it.
-
-> **Publishing a branch without merging** replaces what is already online,
-> including for the teacher: _Actions_ > _Verify and deploy_ > _Run workflow_ >
-> pick the branch. GitHub gates this separately: the branch must be allowed
-> under `Settings` > `Environments` > `github-pages` > _Deployment branches
-> and tags_, or the job fails with "Branch is not allowed to deploy to github-pages".
+Two things worth reading before a first change: [where the module boundary
+runs, and what the app stores](docs/architecture.md), and [how the site gets
+published](docs/deploying.md).
 
 ## Licence
 
